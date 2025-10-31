@@ -1,0 +1,97 @@
+[project]
+name = "ttc-analysis"
+version = "0.1.0"
+description = "TTC Analysis – ETL, analytics, and API for transit KPIs"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [{ name = "S. Muhammad Daveisha Ali" }]
+keywords = ["transit", "analytics", "fastapi", "geospatial", "parquet", "postgresql"]
+
+# Runtime deps (pin to stable minor lines; allow patch updates)
+dependencies = [
+  # Data & science
+  "pandas>=2.3.3,<2.4",
+  "scipy>=1.16,<2",
+  "pyarrow>=22.0.0,<23.0.0",
+  # Geospatial & viz
+  "geopandas>=1.1.1,<1.2",
+  "folium>=0.20,<0.21",
+  "plotly>=6.3,<7",
+  "streamlit>=1.50.0",
+  "streamlit-folium",
+  "openpyxl>=3.1.5",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3,<9",
+  "ruff>=0.7,<0.8",
+  "black>=25,<26",
+  "mypy>=1.15,<2",
+  "pre-commit>=4.3,<5",
+  "types-requests>=2.32.4.20250913",
+  "httpx>=0.28.1",
+  "pytest-asyncio>=1.2.0",
+  "anyio>=4.11.0",
+]
+
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ---- Setuptools: restrict packaging to ONLY the Python package ----
+[tool.setuptools]
+packages = ["ttc_analysis"]          # explicitly list the only package to ship
+include-package-data = false
+
+# Optional if you want to be very explicit about where the package lives
+[tool.setuptools.package-dir]
+ttc_analysis = "ttc_analysis"
+
+# ----------------- Tooling config (lint/type/style) -----------------
+
+[tool.mypy]
+python_version = "3.13"
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+# Enable rule families (Flynt = FLY)
+select = [
+  "E",      # pycodestyle
+  "F",      # pyflakes
+  "I",      # isort
+  "UP",     # pyupgrade
+  "B",      # bugbear
+  "PL",     # pylint (ruff's subset)
+  "PERF",   # perflint
+  "ASYNC",  # flake8-async
+  "FLY"     # flynt
+]
+
+# Ignore specific rules (list, not a sub-table)
+ignore = [
+  "E501",                    # line length (formatter handles it)
+  "E402",                    # imports not at top (legacy scripts)
+  "E702",                    # multiple statements per line (legacy scripts)
+  "B008",                    # call in default arg (common in FastAPI deps)
+  "B904",                    # raise ... from (baseline until standardized)
+  "PLR0912", "PLR0913", "PLR0915",      # complexity & too many args (baseline)
+  "PLR2004"                  # magic numbers
+]
+
+# Optional: file-pattern-specific ignores (example)
+[tool.ruff.lint.extend-per-file-ignores]
+"__init__.py" = ["F401"]     # allow unused imports in package inits
+
+[tool.black]
+line-length = 100
+target-version = ["py313"]
